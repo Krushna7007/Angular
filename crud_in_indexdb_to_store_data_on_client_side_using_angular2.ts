@@ -106,7 +106,8 @@ export class RatingsComponent implements OnInit {
 
 
 		feedbackrating.metadata = this.lattitude + ":" + this.longitude;
-		// Dev name: Krushna (11-12-2019)
+		// Dev name: Krushna Gaikwad(11-12-2019)
+		// Start CRUD Operation to Store data in indexdb on cLient side
 		// check whether is offline or online if online fire postRating api else store data in indexdb    
 		if (navigator.onLine) {
 			// Yes Online send data to Servies to send data to postRatingAPI
@@ -126,21 +127,21 @@ export class RatingsComponent implements OnInit {
 			var req = window.indexedDB;
 			var request = req.open("survey_localStorage", 1);  //req.open("database_name",version) // create db if with given name if db doesn't exists
 
-			request.onupgradeneeded = function (event) { //call on first time when table is not created
+			request.onupgradeneeded = function (event) { 
 				db = (<FileReader>event.target).result; // InterFace FileReader use for Event Target(getting error use <FileReader>) 
 				db.createObjectStore("rating", { keyPath: "id", autoIncrement: true });
 			};
-			request.onsuccess = function (event) {
+			request.onsuccess = function (event) { 
 				let reader = new FileReader();
 				db = (<FileReader>event.target).result;
-				var get_data = db.transaction(["rating"]).objectStore("rating").getAll();
+				var get_data = db.transaction(["rating"]).objectStore("rating").getAll(); //read all data in rating table
 				get_data.onsuccess = function (event) {
 					outer_array();
 				}
 				get_data.onerror = function (event) {
 					console.log(" fetching data error:")
 				}
-				//used to fetch result outside function for furhter use
+				//used to fetch result outside function for further use
 				let outer_array = () => {
 					data = get_data.result;
 					if (data) {
@@ -213,8 +214,9 @@ export class RatingsComponent implements OnInit {
 
 	// if browser is supported with IndexedDB then storing feedbacks in indexed db
 	// onerror() : Get called if any error is occurs while execution.
-	// onsuccess() : Get called if rating table is already exists in index db then store data in rating table.
-	// onupgradeneeded() : Get called if rating table is not exits then it will create table and store data in the new table.
+	// onsuccess() : continue to work with database using db object
+	// onupgradeneeded() : // triggers if the client had no database
+ 			      // ...perform initialization...
 	OfflineDataStore(localstorag_insert_data_dict) {
 		var reader = new FileReader();
 		var db, objectStore;
